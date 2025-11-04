@@ -1,3 +1,7 @@
+-- // TuffCMD main
+-- // TODO:
+	-- 1. Organise ur loadstrings (they're horrendous)
+
 function fromRGB(r,g,b) 
 	return Color3.new(r/255,g/255,b/255) 
 end
@@ -86,7 +90,24 @@ local function Notify(Text, duration)
 	coroutine.resume(nthread)
 end
 
+-- // oh my god tobob you couldnt have done this more efficiently? 😭😭😭
+-- // I'll organise this more tmr
 --// loadstrings
+
+function checkHttpSupport(): boolean
+	local success = false;
+	local testUrl = "https://www.google.com"
+	pcall(function() 
+		
+	end)
+
+	return success;
+end
+
+function loadfromurl(url: string): any
+	
+end
+
 function run_DogeArmy()
 	local s, r = pcall(function()
 		loadstring(game:HttpGetAsync("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/DogeArmy.lua"))()
@@ -149,8 +170,7 @@ addCmd("jumppower", function(targetName, value)
 	for _, plr in ipairs(GetPlayers(targetName)) do
 		local hum = plr.Character and plr.Character:FindFirstChild("Humanoid")
 		if hum then
-				hum.JumpPower = tonumber(value) or 50
-			end
+			hum.JumpPower = tonumber(value) or 50
 		end
 	end
 end)
