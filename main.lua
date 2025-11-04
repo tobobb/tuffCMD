@@ -116,7 +116,7 @@ end
 
 function run_JohnDoe()
 	local s, r = pcall(function()
-		loadstring(game:HttpGetAsync("http://raw.githubusercontent.com/ZwDaNk/rocky2u-cmdscript/refs/heads/main/data/johndoe.lua"))()
+		loadstring(game:HttpGetAsync("http://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua"))()
 	end)
 	if not s then
 		Notify("Your exploit does NOT have HttpGet / HttpGetAsync!", 3.5)
