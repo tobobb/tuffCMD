@@ -998,7 +998,7 @@ delay(0,function()
 	end
 end)
 delay(0.1,function()
-	write("PRESS Q TO SUMMON A DOGE || Z TO CYCLE TYPE",label)
+	write("PRESS E TO SUMMON A DOGE || Z TO CYCLE TYPE",label)
 	write("CURRENT STATUS || "..status,tag)
 	write("CURRENT TYPE || "..class,find)
 end)
@@ -1009,7 +1009,7 @@ end)
 mouse.KeyDown:connect(function(input,process)
 	if true then
 		local key = input
-		if key == 'q' then
+		if key == 'e' then
 			create(nil)
 			local wow = Instance.new("TextLabel")
 			wow.Parent = starter
