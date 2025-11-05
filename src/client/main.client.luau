@@ -1,6 +1,10 @@
 -- // TuffCMD main
--- // TODO:
-	-- 1. Organise ur loadstrings (they're horrendous)
+
+--------------------------------------------------
+HTTP_REQUESTS_SUPPORTED = false;
+LOADSTRING_SUPPORTED = false;
+local HTTPGET: (url: string) -> string;
+--------------------------------------------------
 
 function fromRGB(r,g,b) 
 	return Color3.new(r/255,g/255,b/255) 
@@ -81,9 +85,9 @@ local function Notify(Text, duration)
 
 		local startPos = Frame.Position
 		local endPos = UDim2.new(0, 10, 0, 450)
-		Frame:TweenPosition(endPos, Enum.EasingDirection.In, Enum.EasingStyle.Quad, 2, false)
+		Frame:TweenPosition(endPos, Enum.EasingDirection.In, Enum.EasingStyle.Sine, 2, false)
 		wait(duration)
-		Frame:TweenPosition(startPos, Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 2, false)
+		Frame:TweenPosition(startPos, Enum.EasingDirection.Out, Enum.EasingStyle.Sine, 2, false)
 		wait(2)
 		sGui:Destroy()
 	end)
@@ -95,54 +99,73 @@ end
 -- // I'll organise this more tmr
 --// loadstrings
 
-function checkHttpSupport(): boolean
+function checkLoadstringSupport(): boolean
+	local result = false;
+
+	local test = [[
+local r, c, x;
+
+r = 5;
+c = 10;
+x = 15;
+
+local calculation = r + c + x;
+
+if (calculation ~= 30) then
+	error('Loadstring is not supported!');
+	return nil;
+end
+return calculation
+]];
+
+	xpcall(
+		function ()
+			local res: number? = loadstring(test)();
+			if (res and res == 30) then
+				result = true;
+			end
+		end,
+		function (e) 
+			result = false;
+		end
+	);
+
+	return result;
+end
+
+function checkHttpSupport(): (boolean, (string) -> string)
 	local success = false;
-	local testUrl = "https://www.google.com"
+	local httpget = nil;
+	local testUrl = "https://postman-echo.com/get";
 	pcall(function() 
-		
+		local r = game:HttpGet(testUrl, false);
+		if (r and string.match(r, "^%s*$") ~= nil) then
+			success = true;
+			httpget = function (...) return game:HttpGet(...) end;
+		end
+		local r2 = game:HttpGetAsync(testUrl, false);
+		if (r2 and string.match(r2, "^%s*$") ~= nil) then
+			success = true;
+			httpget = function (...) return game:HttpGetAsync(...) end;
+		end
 	end)
 
-	return success;
+	return success, httpget;
 end
 
 function loadfromurl(url: string): any
-	
-end
+	if (not HTTP_REQUESTS_SUPPORTED) then Notify("Your executor does not support HTTP requests!"); return end;
+	if (not LOADSTRING_SUPPORTED) then Notify("Your executor does not support loadstring!"); return end;
 
-function run_DogeArmy()
-	local s, r = pcall(function()
-		loadstring(game:HttpGetAsync("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/DogeArmy.lua"))()
-	end)
-	if not s then
-		Notify("Your exploit does NOT have HttpGet / HttpGetAsync!", 3.5)
-	end
-end
-
-function run_Dex()
-	local s, r = pcall(function()
-		loadstring(game:HttpGetAsync("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua"))()
-	end)
-	if not s then
-		Notify("Your exploit does NOT have HttpGet / HttpGetAsync!", 3.5)
-	end
-end
-
-function run_HolyWrench()
-	local s, r = pcall(function()
-		loadstring(game:HttpGetAsync("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/HolyWrench.lua"))()
-	end)
-	if not s then
-		Notify("Your exploit does NOT have HttpGet / HttpGetAsync!", 3.5)
-	end
-end
-
-function run_JohnDoe()
-	local s, r = pcall(function()
-		loadstring(game:HttpGetAsync("http://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua"))()
-	end)
-	if not s then
-		Notify("Your exploit does NOT have HttpGet / HttpGetAsync!", 3.5)
-	end
+	xpcall(
+		function ()
+			local resp = HTTPGET(url);
+			task.spawn(loadstring(resp));
+		end,
+		function (e)
+			Notify(e);
+		end
+	);
 end
 
 --// command register func
@@ -244,21 +267,11 @@ addCmd("btools", function(targetName)
 	end
 end)
 
-addCmd("johndoe", function()
-	run_JohnDoe()
-end)
-
-addCmd("dogearmy", function()
-	run_DogeArmy()
-end)
-
-addCmd("holywrench", function()
-	run_HolyWrench()
-end)
-
-addCmd("dex", function()
-	run_Dex()
-end)
+-- // there you go i organised it 
+addCmd("johndoe", function () loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua") end);
+addCmd("dogearmy", function() loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/DogeArmy.lua") end);
+addCmd("holywrench", function () loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/HolyWrench.lua") end);
+addCmd("dex", function () loadfromurl("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua") end);
 
 --// input check :p
 TextBox.FocusLost:connect(function(enterPressed)
@@ -294,6 +307,22 @@ local athread = coroutine.create(function()
 		Notify("Filtering is ENABLED.", 3)
 	else
 		Notify("Filtering is DISABLED.", 3)
+	end
+	task.wait(3.5);
+	local cres, variant = checkHttpSupport();
+	local lres = checkLoadstringSupport();
+
+	HTTP_REQUESTS_SUPPORTED = cres;
+	HTTPGET = variant;
+
+	LOADSTRING_SUPPORTED = lres;
+
+	if (not HTTP_REQUESTS_SUPPORTED) then
+		Notify("Your executor does not support HTTP requests.");
+	end
+	task.wait(3);
+	if (not LOADSTRING_SUPPORTED) then
+		Notify("Your executor does not support loadstring.");
 	end
 end)
 coroutine.resume(athread)
