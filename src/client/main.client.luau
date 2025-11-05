@@ -3,7 +3,7 @@
 --------------------------------------------------
 HTTP_REQUESTS_SUPPORTED = false;
 LOADSTRING_SUPPORTED = false;
-local HTTPGET: (url: string) -> string;
+HTTPGET = nil;
 --------------------------------------------------
 
 function fromRGB(r,g,b) 
@@ -99,7 +99,7 @@ end
 -- // I'll organise this more tmr
 --// loadstrings
 
-function checkLoadstringSupport(): boolean
+function checkLoadstringSupport()
 	local result = false;
 
 	local test = [[
@@ -120,7 +120,7 @@ return calculation
 
 	xpcall(
 		function ()
-			local res: number? = loadstring(test)();
+			local res = loadstring(test)();
 			if (res and res == 30) then
 				result = true;
 			end
@@ -133,7 +133,7 @@ return calculation
 	return result;
 end
 
-function checkHttpSupport(): (boolean, (string) -> string)
+function checkHttpSupport()
 	local success = false;
 	local httpget = nil;
 	local testUrl = "https://postman-echo.com/get";
@@ -153,7 +153,7 @@ function checkHttpSupport(): (boolean, (string) -> string)
 	return success, httpget;
 end
 
-function loadfromurl(url: string): any
+function loadfromurl(url)
 	if (not HTTP_REQUESTS_SUPPORTED) then Notify("Your executor does not support HTTP requests!"); return end;
 	if (not LOADSTRING_SUPPORTED) then Notify("Your executor does not support loadstring!"); return end;
 
