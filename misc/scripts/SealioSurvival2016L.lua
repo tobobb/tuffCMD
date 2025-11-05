@@ -12997,4 +12997,3 @@ RS.RenderStepped:connect(function()
 		(player.Character:FindFirstChild("Right Arm") or player.Character:FindFirstChild("Left Arm")).LocalTransparencyModifier = 0
 	end
 end)
->>>>>>> debc4f0e9f1329dc3e3305cc04b8187b3df0b7b8
