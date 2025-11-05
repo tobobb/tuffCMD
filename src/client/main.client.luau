@@ -423,7 +423,7 @@ local athread = coroutine.create(function()
 	else
 		Notify("Filtering is DISABLED.", 3)
 	end
-	wait(3.5)
+	wait(3.5);
 	local cres, variant = checkHttpSupport();
 	local lres = checkLoadstringSupport();
 
@@ -435,7 +435,7 @@ local athread = coroutine.create(function()
 	if (not HTTP_REQUESTS_SUPPORTED) then
 		Notify("Your executor does not support HTTP requests.");
 	end
-	task.wait(3);
+	wait(3);
 	if (not LOADSTRING_SUPPORTED) then
 		Notify("Your executor does not support loadstring!");
 	end
