@@ -220,7 +220,7 @@ function checkHttpSupport()
 			success = true;
 			httpget = function (...) return game:HttpGet(...) end;
 		end
-		local r2 = game:HttpGetAsync(testUrl, false);
+		local r2 = game:HttpGetAsync(testUrl, true);
 		if (r2 and string.match(r2, "^%s*$") ~= nil) then
 			success = true;
 			httpget = function (...) return game:HttpGetAsync(...) end;
@@ -423,6 +423,7 @@ local athread = coroutine.create(function()
 		Notify("Filtering is DISABLED.", 3)
 	end
 	wait(3.5);
+	wait(3.5);
 	local cres, variant = checkHttpSupport();
 	local lres = checkLoadstringSupport();
 
@@ -434,6 +435,7 @@ local athread = coroutine.create(function()
 	if (not HTTP_REQUESTS_SUPPORTED) then
 		Notify("Your executor does not support HTTP requests.");
 	end
+	wait(3);
 	wait(3);
 	if (not LOADSTRING_SUPPORTED) then
 		Notify("Your executor does not support loadstring!");

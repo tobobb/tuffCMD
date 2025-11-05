@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 -- Infection Virus - Backported and localized to 2016L
 -- SultanOfSwing
 
@@ -1384,5 +1383,4 @@ function stankylegg(Model)
 	}
 end
 
->>>>>>> debc4f0e9f1329dc3e3305cc04b8187b3df0b7b8
 wiras(PatientZero.Character)
