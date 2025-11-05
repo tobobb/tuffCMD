@@ -6,15 +6,26 @@ LOADSTRING_SUPPORTED = false;
 HTTPGET = nil;
 --------------------------------------------------
 
-function fromRGB(r,g,b) 
-	return Color3.new(r/255,g/255,b/255) 
-end
+local RunService = game:GetService('RunService');
 
 local Player = game.Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 local Mouse = Player:GetMouse()
 
-local screenGui = Instance.new("ScreenGui", PlayerGui)
+function gethui()
+	local hasCore = pcall(function() return game:GetService("CoreGui").Name end)	
+	if (hasCore == "CoreGui") then
+		return game:GetService("CoreGui");
+	end
+	return Player.PlayerGui;
+end
+
+function fromRGB(r,g,b) 
+	return Color3.new(r/255,g/255,b/255) 
+end
+
+local screenGui = Instance.new("ScreenGui");
+screenGui.Parent = gethui();
 screenGui.Name = "TuffCMD"
 screenGui.ResetOnSpawn = false
 
@@ -28,6 +39,72 @@ TextBox.Size = UDim2.new(0, 250, 0, 20)
 TextBox.Position = UDim2.new(1, -250, 1, -20)
 TextBox.TextWrapped = true
 TextBox.Text = "TuffCMD | Command bar"
+
+local cmdsframe = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local cmdContentFrame = Instance.new("ScrollingFrame")
+local TestCmdLabel = Instance.new("TextLabel")
+local CloseCmdsFrame = Instance.new("TextButton")
+
+cmdsframe.Name = "cmdsframe"
+cmdsframe.Parent = screenGui
+cmdsframe.AnchorPoint = Vector2.new(0.5, 0.5)
+cmdsframe.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+cmdsframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+cmdsframe.BorderSizePixel = 0
+cmdsframe.Position = UDim2.new(0.499662161, 0, 0.499999911, 0)
+cmdsframe.Size = UDim2.new(0, 313, 0, 392)
+cmdsframe.Visible = false
+
+TextLabel.Parent = cmdsframe
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0.498402566, 0, 0.0433673486, 0)
+TextLabel.Size = UDim2.new(0, 200, 0, 34)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "TuffCMD | Commands"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 15.000
+
+cmdContentFrame.Name = "cmdContentFrame"
+cmdContentFrame.Parent = cmdsframe
+cmdContentFrame.Active = true
+cmdContentFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+cmdContentFrame.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+cmdContentFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+cmdContentFrame.BorderSizePixel = 0
+cmdContentFrame.Position = UDim2.new(0.504792333, 0, 0.536989808, 0)
+cmdContentFrame.Size = UDim2.new(0, 284, 0, 335)
+cmdContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+TestCmdLabel.Name = "TestCmdLabel"
+TestCmdLabel.Parent = cmdContentFrame
+TestCmdLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TestCmdLabel.BackgroundTransparency = 1.000
+TestCmdLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TestCmdLabel.BorderSizePixel = 0
+TestCmdLabel.Size = UDim2.new(0, 284, 0, 34)
+TestCmdLabel.Visible = false
+TestCmdLabel.Font = Enum.Font.SourceSans
+TestCmdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TestCmdLabel.TextSize = 14.000
+
+CloseCmdsFrame.Name = "CloseCmdsFrame"
+CloseCmdsFrame.Parent = cmdsframe
+CloseCmdsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+CloseCmdsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseCmdsFrame.BackgroundTransparency = 1.000
+CloseCmdsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CloseCmdsFrame.BorderSizePixel = 0
+CloseCmdsFrame.Position = UDim2.new(0.940894544, 0, 0.0408163257, 0)
+CloseCmdsFrame.Size = UDim2.new(0, 23, 0, 22)
+CloseCmdsFrame.Font = Enum.Font.SourceSans
+CloseCmdsFrame.Text = "X"
+CloseCmdsFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseCmdsFrame.TextSize = 14.000
 
 local Commands = {}
 
@@ -153,24 +230,27 @@ function checkHttpSupport()
 	return success, httpget;
 end
 
-function loadfromurl(url)
-	if (not HTTP_REQUESTS_SUPPORTED) then Notify("Your executor does not support HTTP requests!"); return end;
-	if (not LOADSTRING_SUPPORTED) then Notify("Your executor does not support loadstring!"); return end;
-
-	xpcall(
-		function ()
-			local resp = HTTPGET(url);
-			task.spawn(loadstring(resp));
-		end,
-		function (e)
-			Notify(e);
-		end
-	);
-end
-
 --// command register func
 local function addCmd(name, func)
 	Commands[name] = func
+end
+
+local function addLsCmd(name, loadstringurl)
+	Commands[name] = function ()
+		if (not HTTP_REQUESTS_SUPPORTED) then Notify("Your executor does not support HTTP requests!"); return end;
+		if (not LOADSTRING_SUPPORTED) then Notify("Your executor does not support loadstring!"); return end;
+
+		xpcall(
+			function ()
+				local data = HTTPGET(loadstringurl);
+				task.spawn(loadstring(data));
+			end,
+			function (e)
+				Notify("An error occured while trying to run this script!");
+				Notify(e);
+			end
+		)
+	end
 end
 
 --// commands
@@ -267,11 +347,40 @@ addCmd("btools", function(targetName)
 	end
 end)
 
--- // there you go i organised it 
-addCmd("johndoe", function () loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua") end);
-addCmd("dogearmy", function() loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/DogeArmy.lua") end);
-addCmd("holywrench", function () loadfromurl("https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/HolyWrench.lua") end);
-addCmd("dex", function () loadfromurl("http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua") end);
+addLsCmd("johndoe", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua");
+addLsCmd("dogearmy", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/DogeArmy.lua")
+addLsCmd("holywrench", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/HolyWrench.lua")
+addLsCmd("dex", "http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua");
+addLsCmd("sealiosurvival", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/SealioSurvival2016L.lua");
+addLsCmd("wiras", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/2016L-wiras.lua");
+
+--------------------------------------------------------------------------
+local __idx = 0;
+addCmd("cmds", function ()
+	__idx = 0;
+
+	TestCmdLabel.Parent = nil;
+	cmdContentFrame:ClearAllChildren();
+	TestCmdLabel.Parent = cmdContentFrame;
+
+	for name, func in pairs(Commands) do
+		__idx = __idx + 1;
+		local n = TestCmdLabel:Clone();
+
+		n.Parent = cmdContentFrame;
+		n.Name = name;
+		n.Visible = true;
+		n.Text = name;
+
+		if (__idx > 1) then
+			n.Position = TestCmdLabel.Position + UDim2.new(0, 0, __idx * 0.05, 0);
+			cmdContentFrame.CanvasSize = cmdContentFrame.CanvasSize + UDim2.new(0, 0, 0.05, 0);
+		end
+	end
+
+	cmdsframe.Visible = true;
+end)
+--------------------------------------------------------------------------
 
 --// input check :p
 TextBox.FocusLost:connect(function(enterPressed)
@@ -300,6 +409,10 @@ Mouse.KeyDown:connect(function(key)
 	end
 end)
 
+CloseCmdsFrame.MouseButton1Click:Connect(function()
+	cmdsframe.Visible = false;
+end)
+
 local athread = coroutine.create(function()
 	Notify("Welcome, "..game:GetService("Players").LocalPlayer.Name.."!", 3)
 	wait(4.5)
@@ -322,7 +435,7 @@ local athread = coroutine.create(function()
 	end
 	task.wait(3);
 	if (not LOADSTRING_SUPPORTED) then
-		Notify("Your executor does not support loadstring.");
+		Notify("Your executor does not support loadstring!");
 	end
 end)
 coroutine.resume(athread)
