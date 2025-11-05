@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 -- SealioSurvival backport from SS to client for 2016L
 -- This was some of the worst code I've ever had to work with. Holy shit. Thanks to louknt for converting the items via LM->S.
 -- SultanOfSwing
