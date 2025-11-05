@@ -214,7 +214,7 @@ function checkHttpSupport()
 	local success = false;
 	local httpget = nil;
 	local testUrl = "https://postman-echo.com/get";
-	pcall(function() 
+	local s, r = pcall(function() 
 		local r = game:HttpGet(testUrl, false);
 		if (r and string.match(r, "^%s*$") ~= nil) then
 			success = true;
@@ -226,6 +226,7 @@ function checkHttpSupport()
 			httpget = function (...) return game:HttpGetAsync(...) end;
 		end
 	end)
+	print(s, r);
 
 	return success, httpget;
 end
@@ -243,7 +244,7 @@ local function addLsCmd(name, loadstringurl)
 		xpcall(
 			function ()
 				local data = HTTPGET(loadstringurl);
-				task.spawn(loadstring(data));
+				coroutine.wrap(loadstring(data))();
 			end,
 			function (e)
 				Notify("An error occured while trying to run this script!");
@@ -421,7 +422,7 @@ local athread = coroutine.create(function()
 	else
 		Notify("Filtering is DISABLED.", 3)
 	end
-	task.wait(3.5);
+	wait(3.5);
 	local cres, variant = checkHttpSupport();
 	local lres = checkLoadstringSupport();
 
@@ -433,7 +434,7 @@ local athread = coroutine.create(function()
 	if (not HTTP_REQUESTS_SUPPORTED) then
 		Notify("Your executor does not support HTTP requests.");
 	end
-	task.wait(3);
+	wait(3);
 	if (not LOADSTRING_SUPPORTED) then
 		Notify("Your executor does not support loadstring!");
 	end
