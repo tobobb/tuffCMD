@@ -423,7 +423,7 @@ local athread = coroutine.create(function()
 	else
 		Notify("Filtering is DISABLED.", 3)
 	end
-	task.wait(3.5);
+	wait(3.5)
 	local cres, variant = checkHttpSupport();
 	local lres = checkLoadstringSupport();
 
