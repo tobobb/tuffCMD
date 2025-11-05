@@ -243,7 +243,9 @@ local function addLsCmd(name, loadstringurl)
 		xpcall(
 			function ()
 				local data = HTTPGET(loadstringurl);
-				task.spawn(loadstring(data));
+				coroutine.resume(coroutine.create(function()
+					loadstring(data)()
+				end))
 			end,
 			function (e)
 				Notify("An error occured while trying to run this script!");
