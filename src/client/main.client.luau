@@ -171,11 +171,6 @@ local function Notify(Text, duration)
 	coroutine.resume(nthread)
 end
 
--- // oh my god tobob you couldnt have done this more efficiently? 😭😭😭
--- // shut UP buddy!!!!!!!! - tobob
--- // I'll organise this more tmr
---// loadstrings
-
 function checkLoadstringSupport()
 	local result = false;
 
@@ -204,6 +199,7 @@ return calculation
 		end,
 		function (e) 
 			result = false;
+			warn("loadstring test failed: ", e);
 		end
 	);
 
@@ -214,7 +210,7 @@ function checkHttpSupport()
 	local success = false;
 	local httpget = nil;
 	local testUrl = "https://postman-echo.com/get";
-	pcall(function() 
+	local s, r = pcall(function() 
 		local r = game:HttpGet(testUrl, false);
 		if (r and string.match(r, "^%s*$") ~= nil) then
 			success = true;
@@ -226,6 +222,7 @@ function checkHttpSupport()
 			httpget = function (...) return game:HttpGetAsync(...) end;
 		end
 	end)
+	print("CheckHttpSupport results: ", s, r);
 
 	return success, httpget;
 end
@@ -247,6 +244,7 @@ local function addLsCmd(name, loadstringurl)
 			end,
 			function (e)
 				Notify("An error occured while trying to run this script!");
+				wait(3);
 				Notify(e);
 			end
 		)
@@ -353,6 +351,7 @@ addLsCmd("holywrench", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/he
 addLsCmd("dex", "http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua");
 addLsCmd("sealiosurvival", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/SealioSurvival2016L.lua");
 addLsCmd("wiras", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/2016L-wiras.lua");
+addLsCmd("barkgun", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/BarkGun%20V1.lua");
 
 --------------------------------------------------------------------------
 local __idx = 0;
