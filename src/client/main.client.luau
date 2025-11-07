@@ -214,7 +214,7 @@ function checkHttpSupport()
 	local success = false;
 	local httpget = nil;
 	local testUrl = "https://postman-echo.com/get";
-	local s, r = pcall(function() 
+	pcall(function() 
 		local r = game:HttpGet(testUrl, false);
 		if (r and string.match(r, "^%s*$") ~= nil) then
 			success = true;
@@ -226,7 +226,6 @@ function checkHttpSupport()
 			httpget = function (...) return game:HttpGetAsync(...) end;
 		end
 	end)
-	print(s, r);
 
 	return success, httpget;
 end
