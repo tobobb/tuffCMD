@@ -244,20 +244,6 @@ local function Notify(Text, duration)
 	coroutine.resume(nthread)
 end
 
-local function _UpdateClogsScrollingframeCanvasSize()
-	local textLabel = clogsmainlabel;
-	local scrollingFrame = clogscontentframe;
-
-	local textBounds = textLabel.TextBounds
-    local canvasSize = scrollingFrame.AbsoluteSize
-
-    if textBounds.Y > canvasSize.Y then
-        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, textBounds.Y)
-    else
-        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, canvasSize.Y)
-    end
-end
-
 function checkLoadstringSupport()
 	local result = false;
 
