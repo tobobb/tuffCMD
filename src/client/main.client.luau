@@ -484,7 +484,7 @@ Mouse.KeyDown:connect(function(key)
 	end
 end)
 
-CloseCmdsFrame.MouseButton1Click:Connect(function()
+CloseCmdsFrame.MouseButton1Click:connect(function()
 	cmdsframe.Visible = false;
 end)
 
@@ -519,7 +519,7 @@ coroutine.resume(athread)
 
 ---------------------------------------------------------------------
 
-CloseChatlogsFrame.MouseButton1Click:Connect(function()
+CloseChatlogsFrame.MouseButton1Click:connect(function()
 	chatlogsframe.Visible = false;
 end)
 
@@ -529,9 +529,9 @@ function LogChat(comingFrom, chatContent)
 	_UpdateClogsScrollingframeCanvasSize();
 end
 
-Players.PlayerAdded:Connect(function(plr)
+Players.PlayerAdded:connect(function(plr)
 	CONNECTIONS[plr.Name] = {};
-	local nconn = plr.Chatted:Connect(function(c)
+	local nconn = plr.Chatted:connect(function(c)
 		LogChat(plr, c);
 	end);
 	table.insert(CONNECTIONS[plr.Name], nconn);
@@ -541,13 +541,13 @@ for _, plr in ipairs(Players:GetPlayers()) do
 	if (not CONNECTIONS[plr.Name]) then
 		CONNECTIONS[plr.Name] = {};
 	end
-	local nconn = plr.Chatted:Connect(function(c)
+	local nconn = plr.Chatted:connect(function(c)
 		LogChat(plr, c);
 	end);
 	table.insert(CONNECTIONS[plr.Name], nconn);
 end
 
-Players.PlayerRemoving:Connect(function(plr)
+Players.PlayerRemoving:connect(function(plr)
 	if (not CONNECTIONS[plr.Name]) then return end;
 
 	for connIdx, conn in ipairs(CONNECTIONS[plr.Name]) do
