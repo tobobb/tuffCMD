@@ -171,11 +171,6 @@ local function Notify(Text, duration)
 	coroutine.resume(nthread)
 end
 
--- // oh my god tobob you couldnt have done this more efficiently? 😭😭😭
--- // shut UP buddy!!!!!!!! - tobob
--- // I'll organise this more tmr
---// loadstrings
-
 function checkLoadstringSupport()
 	local result = false;
 
