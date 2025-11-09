@@ -4,8 +4,11 @@
 HTTP_REQUESTS_SUPPORTED = false;
 LOADSTRING_SUPPORTED = false;
 HTTPGET = nil;
+FULLCHATLOG = "// TuffCMD chat logs.\n";
+CONNECTIONS = {};
 --------------------------------------------------
 
+local Players = game:GetService("Players")
 local RunService = game:GetService('RunService');
 
 local Player = game.Players.LocalPlayer
@@ -45,6 +48,11 @@ local TextLabel = Instance.new("TextLabel")
 local cmdContentFrame = Instance.new("ScrollingFrame")
 local TestCmdLabel = Instance.new("TextLabel")
 local CloseCmdsFrame = Instance.new("TextButton")
+local chatlogsframe = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local clogscontentframe = Instance.new("ScrollingFrame")
+local clogsmainlabel = Instance.new("TextLabel")
+local CloseChatlogsFrame = Instance.new("TextButton")
 
 cmdsframe.Name = "cmdsframe"
 cmdsframe.Parent = screenGui
@@ -55,6 +63,7 @@ cmdsframe.BorderSizePixel = 0
 cmdsframe.Position = UDim2.new(0.499662161, 0, 0.499999911, 0)
 cmdsframe.Size = UDim2.new(0, 313, 0, 392)
 cmdsframe.Visible = false
+pcall(function() cmdsframe.Draggable = true end)
 
 TextLabel.Parent = cmdsframe
 TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -105,6 +114,70 @@ CloseCmdsFrame.Font = Enum.Font.SourceSans
 CloseCmdsFrame.Text = "X"
 CloseCmdsFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
 CloseCmdsFrame.TextSize = 14.000
+
+chatlogsframe.Name = "chatlogsframe"
+chatlogsframe.Parent = screenGui
+chatlogsframe.AnchorPoint = Vector2.new(0.5, 0.5)
+chatlogsframe.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+chatlogsframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+chatlogsframe.BorderSizePixel = 0
+chatlogsframe.Position = UDim2.new(0.5, 0, 0.499385744, 0)
+chatlogsframe.Size = UDim2.new(0, 526, 0, 307)
+chatlogsframe.Visible = false
+pcall(function() chatlogsframe.Draggable = true end)
+
+TextLabel.Parent = chatlogsframe
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Position = UDim2.new(0.201824695, 7, 0.053139355, 1)
+TextLabel.Size = UDim2.new(0, 200, 0, 34)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "TuffCMD | Chat Logs"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextSize = 15.000
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+clogscontentframe.Name = "clogscontentframe"
+clogscontentframe.Parent = chatlogsframe
+clogscontentframe.Active = true
+clogscontentframe.AnchorPoint = Vector2.new(0.5, 0.5)
+clogscontentframe.BackgroundColor3 = Color3.fromRGB(36, 36, 37)
+clogscontentframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+clogscontentframe.BorderSizePixel = 0
+clogscontentframe.Position = UDim2.new(0.498138309, 0, 0.530475259, 0)
+clogscontentframe.Size = UDim2.new(0, 499, 0, 259)
+clogscontentframe.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+clogsmainlabel.Name = "clogsmainlabel"
+clogsmainlabel.Parent = clogscontentframe
+clogsmainlabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+clogsmainlabel.BackgroundTransparency = 1.000
+clogsmainlabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+clogsmainlabel.BorderSizePixel = 0
+clogsmainlabel.Size = UDim2.new(1, 0, 1, 0)
+clogsmainlabel.Font = Enum.Font.SourceSans
+clogsmainlabel.Text = FULLCHATLOG
+clogsmainlabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+clogsmainlabel.TextSize = 14.000
+clogsmainlabel.TextXAlignment = Enum.TextXAlignment.Left
+clogsmainlabel.TextYAlignment = Enum.TextYAlignment.Top
+
+CloseChatlogsFrame.Name = "CloseChatlogsFrame"
+CloseChatlogsFrame.Parent = chatlogsframe
+CloseChatlogsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+CloseChatlogsFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CloseChatlogsFrame.BackgroundTransparency = 1.000
+CloseChatlogsFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CloseChatlogsFrame.BorderSizePixel = 0
+CloseChatlogsFrame.Position = UDim2.new(0.977016211, -2, 0.0538456328, -2)
+CloseChatlogsFrame.Size = UDim2.new(0, 23, 0, 22)
+CloseChatlogsFrame.Font = Enum.Font.SourceSans
+CloseChatlogsFrame.Text = "X"
+CloseChatlogsFrame.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseChatlogsFrame.TextSize = 14.000
 
 local Commands = {}
 
@@ -231,7 +304,7 @@ local function addCmd(name, func)
 end
 
 local function addLsCmd(name, loadstringurl)
-	Commands[name] = function ()
+	Commands[name] = function (...)
 		if (not HTTP_REQUESTS_SUPPORTED) then Notify("Your executor does not support HTTP requests!"); return end;
 		if (not LOADSTRING_SUPPORTED) then Notify("Your executor does not support loadstring!"); return end;
 
@@ -242,6 +315,7 @@ local function addLsCmd(name, loadstringurl)
 			end,
 			function (e)
 				Notify("An error occured while trying to run this script!");
+				wait(3);
 				Notify(e);
 			end
 		)
@@ -342,12 +416,18 @@ addCmd("btools", function(targetName)
 	end
 end)
 
+addCmd("chatlogs", function()
+	clogsmainlabel.Text = FULLCHATLOG;
+	chatlogsframe.Visible = true;
+end)
+
 addLsCmd("johndoe", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/JohnDoe.lua");
 addLsCmd("dogearmy", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/DogeArmy.lua")
 addLsCmd("holywrench", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/HolyWrench.lua")
 addLsCmd("dex", "http://github.com/tobobb/tuffCMD/raw/refs/heads/main/misc/scripts/Dex.lua");
 addLsCmd("sealiosurvival", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/SealioSurvival2016L.lua");
 addLsCmd("wiras", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/2016L-wiras.lua");
+addLsCmd("barkgun", "https://raw.githubusercontent.com/tobobb/tuffCMD/refs/heads/main/misc/scripts/BarkGun%20V1.lua");
 
 --------------------------------------------------------------------------
 local __idx = 0;
@@ -436,3 +516,42 @@ local athread = coroutine.create(function()
 	end
 end)
 coroutine.resume(athread)
+
+---------------------------------------------------------------------
+
+CloseChatlogsFrame.MouseButton1Click:Connect(function()
+	chatlogsframe.Visible = false;
+end)
+
+function LogChat(comingFrom, chatContent)
+	FULLCHATLOG = FULLCHATLOG.."\n".."<"..comingFrom.Name..">: "..chatContent;
+	clogsmainlabel.Text = FULLCHATLOG;
+	_UpdateClogsScrollingframeCanvasSize();
+end
+
+Players.PlayerAdded:Connect(function(plr)
+	CONNECTIONS[plr.Name] = {};
+	local nconn = plr.Chatted:Connect(function(c)
+		LogChat(plr, c);
+	end);
+	table.insert(CONNECTIONS[plr.Name], nconn);
+end)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+	if (not CONNECTIONS[plr.Name]) then
+		CONNECTIONS[plr.Name] = {};
+	end
+	local nconn = plr.Chatted:Connect(function(c)
+		LogChat(plr, c);
+	end);
+	table.insert(CONNECTIONS[plr.Name], nconn);
+end
+
+Players.PlayerRemoving:Connect(function(plr)
+	if (not CONNECTIONS[plr.Name]) then return end;
+
+	for connIdx, conn in ipairs(CONNECTIONS[plr.Name]) do
+		conn:Disconnect();
+	end
+end)
+---------------------------------------------------------------------
