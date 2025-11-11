@@ -1,11 +1,11 @@
 -- // TuffCMD main
 
 --------------------------------------------------
-HTTP_REQUESTS_SUPPORTED = false;
-LOADSTRING_SUPPORTED = false;
-HTTPGET = nil;
-FULLCHATLOG = "// TuffCMD chat logs.\n";
-CONNECTIONS = {};
+local HTTP_REQUESTS_SUPPORTED = false;
+local LOADSTRING_SUPPORTED = false;
+local HTTPGET = nil;
+local FULLCHATLOG = "// TuffCMD chat logs.\n";
+local CONNECTIONS = {};
 --------------------------------------------------
 
 local Players = game:GetService("Players")
